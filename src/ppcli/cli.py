@@ -1,6 +1,6 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, REMAINDER
 
-from ppcli import __version__
+from . import __version__
 from ppcli.datastructures import PPCli
 
 
@@ -27,15 +27,13 @@ def main():
 
     sub_parsers = parser.add_subparsers(dest="command", required=True)
     sub_parsers.add_parser("list", help="list commands")
-    sub_parsers.add_parser("run", help="run command")
+    sub_parsers.add_parser(
+        "run", help="run command"
+    ).add_argument("cmd", nargs=REMAINDER, help="cmd to run")
     args = parser.parse_args()
     cli = PPCli.from_args(args)
     match args.command:
         case "list":
             print(cli.list())
         case "run":
-            print("not yet implemented")
-
-
-if __name__ == '__main__':
-    main()
+            cli.run()

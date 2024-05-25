@@ -18,13 +18,16 @@ classifiers = [
 ]
 
 [project.scripts]
-play = "ppcli.main:main"
+ppcli = "ppcli.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ppcli"]
 
 [tool.hatch.version]
 path = "src/ppcli/__init__.py"
+
+[tool.ppcli.build]
+shell = "python3 -m build --no-isolation --wheel"
 
 [tool.ppcli.test]
 shell = "pytest"
