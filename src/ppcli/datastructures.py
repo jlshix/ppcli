@@ -15,7 +15,7 @@ class PPCli:
         self.cmd = cmd
 
     @classmethod
-    def from_args(cls, args: Namespace) -> 'PPCli':
+    def from_args(cls, args: Namespace) -> "PPCli":
         return cls(
             command=args.command,
             conf=Conf.from_path(Path(args.config)),
@@ -28,10 +28,12 @@ class PPCli:
 
     def run(self):
         if cmd_len := len(self.cmd) != 1:
-            raise ValueError(f'Invalid command length: {cmd_len}, accepts name only')
+            raise ValueError(f"Invalid command length: {cmd_len}, accepts name only")
         cmd = self.cmd[0]
         if cmd not in self.conf:
-            raise ValueError(f'Invalid cmd: {cmd}, accepts one of {self.conf.commands()}')
+            raise ValueError(
+                f"Invalid cmd: {cmd}, accepts one of {self.conf.commands()}"
+            )
         shell = self.conf.data[cmd]["shell"]
         subprocess.run(shell, shell=True)
 
@@ -44,7 +46,7 @@ class Conf:
         return key in self.data
 
     @classmethod
-    def from_path(cls, path: Path) -> 'Conf':
+    def from_path(cls, path: Path) -> "Conf":
         if not path.exists():
             raise FileExistsError(f"{path} does not exist")
         with path.open() as f:

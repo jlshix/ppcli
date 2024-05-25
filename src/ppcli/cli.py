@@ -8,18 +8,18 @@ def main():
     parser = ArgumentParser(
         description="un shell command defined in pyproject.toml",
     )
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
-        "--version",
-        action="version",
-        version=__version__
-    )
-    parser.add_argument(
-        "-c", "--config",
+        "-c",
+        "--config",
         help="pyproject.toml path, defaults to ./pyproject.toml",
         default="./pyproject.toml",
     )
     parser.add_argument(
-        "-d", "--dotenv", "-e", "--env",
+        "-d",
+        "--dotenv",
+        "-e",
+        "--env",
         dest="env",
         help=".dotenv path, defaults to ./.dotenv",
         default="./.dotenv",
@@ -27,9 +27,9 @@ def main():
 
     sub_parsers = parser.add_subparsers(dest="command", required=True)
     sub_parsers.add_parser("list", help="list commands")
-    sub_parsers.add_parser(
-        "run", help="run command"
-    ).add_argument("cmd", nargs=REMAINDER, help="cmd to run")
+    sub_parsers.add_parser("run", help="run command").add_argument(
+        "cmd", nargs=REMAINDER, help="cmd to run"
+    )
     args = parser.parse_args()
     cli = PPCli.from_args(args)
     match args.command:
