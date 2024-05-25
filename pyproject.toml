@@ -29,5 +29,20 @@ path = "src/ppcli/__init__.py"
 [tool.ppcli.build]
 shell = "python3 -m build --no-isolation --wheel"
 
+[tool.ppcli.install]
+shell = "pip install --find-links=dist ppcli"
+
+[tool.ppcli.uninstall]
+shell = "pip uninstall ppcli"
+
 [tool.ppcli.test]
-shell = "pytest"
+shell = "pytest --cov=src tests/"
+
+[tool.ppcli.mypy]
+shell = "mypy --strict src/"
+
+[tool.ppcli.check]
+shell = "ruff check"
+
+[tool.ppcli.format]
+shell = "ruff format"
