@@ -5,11 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "ppcli"
 dynamic = ["version"]
-description = "run shell command defined in pyproject.toml"
+description = "run script command defined in pyproject.toml"
 authors = [
     { name = "jlshix", email = "jlshix@163.com" }
 ]
-dependencies = []
+dependencies = [
+    "python-dotenv~=1.0.1",
+]
 readme = "README.md"
 requires-python = ">= 3.11"
 classifiers = [
@@ -26,23 +28,30 @@ packages = ["src/ppcli"]
 [tool.hatch.version]
 path = "src/ppcli/__init__.py"
 
+[tool.ppcli._variables]
+GLOBAL = "global"
+
 [tool.ppcli.build]
-shell = "python3 -m build --no-isolation --wheel"
+script = "python3 -m build --no-isolation --wheel"
 
 [tool.ppcli.install]
-shell = "pip install --find-links=dist ppcli"
+script = "pip install --find-links=dist ppcli"
 
 [tool.ppcli.uninstall]
-shell = "pip uninstall ppcli"
+script = "pip uninstall ppcli"
 
 [tool.ppcli.test]
-shell = "pytest --cov=src tests/"
+script = "pytest --cov=src tests/"
 
 [tool.ppcli.mypy]
-shell = "mypy --strict src/"
+script = "mypy --strict src/"
 
 [tool.ppcli.check]
-shell = "ruff check"
+script = "ruff check"
 
 [tool.ppcli.format]
-shell = "ruff format"
+script = "ruff format"
+
+[tool.ppcli.show_env]
+variables = { GLOBAL = "GLB", LOCAL = "LOCAL" }
+script = "env | grep -i global"

@@ -1,3 +1,3 @@
 # ppcli
 
-run shell command defined in pyproject.toml
+run scripts defined in pyproject.toml
