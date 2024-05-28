@@ -11,10 +11,13 @@ class Job(NamedTuple):
 
     @classmethod
     def parse(cls, data: dict[str, str | dict[str, str]]) -> Job:
+        # TODO TypedDict data
+        if not isinstance(data, dict):
+            raise TypeError(f"data must be a dict, but got {type(data)}")
         try:
             script = data["script"]
         except KeyError:
-            raise ValueError("`script` field is required")
+            raise KeyError("`script` field is required")
         if not isinstance(script, str):
             raise TypeError(
                 f"`script` field type must be a string, but got {type(script)}"
@@ -23,7 +26,7 @@ class Job(NamedTuple):
         if not isinstance(variables, dict) or not all(
             isinstance(k, str) and isinstance(v, str) for k, v in variables.items()
         ):
-            raise TypeError("`variables` field should be a dict of str and str")
+            raise TypeError("`variables` field should be a dict[str, str]")
         return cls(script, variables)
 
 
