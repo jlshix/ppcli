@@ -14,7 +14,7 @@ from .datastructures import Conf
 
 def cmd_list(args: Namespace) -> None:
     conf = Conf.from_path(Path(args.config))
-    print(conf.target_names())
+    print(conf.job_names())
 
 
 def cmd_run(args: Namespace) -> None:
@@ -25,24 +25,24 @@ class CmdRun:
     def __init__(
         self,
         conf: Conf,
-        target: list[str],
+        job: list[str],
         dot_envs: list[str],
-        target_envs: list[str],
+        job_envs: list[str],
         use_os_env: bool,
     ) -> None:
         self.conf = conf
-        self.target = target
+        self.job = job
         self.dot_envs = dot_envs
-        self.target_envs = target_envs
+        self.job_envs = job_envs
         self.use_os_env = use_os_env
 
     @classmethod
     def from_args(cls, args: Namespace) -> "CmdRun":
         return cls(
             conf=Conf.from_path(Path(args.config)),
-            target=args.target,
+            job=args.job,
             dot_envs=args.dot_envs,
-            target_envs=args.target_envs,
+            job_envs=args.job_envs,
             use_os_env=args.use_os_env,
         )
 
@@ -51,22 +51,22 @@ class CmdRun:
         for dotenv in self.dot_envs:
             values = dotenv_values(dotenv_path=dotenv)
             rv |= values
-        target_envs = "\n".join(self.target_envs)
-        values = dotenv_values(stream=StringIO(target_envs))
+        job_envs = "\n".join(self.job_envs)
+        values = dotenv_values(stream=StringIO(job_envs))
         rv |= values
         return rv
 
     def run(self) -> None:
-        if target_len := len(self.target) != 1:
-            raise ValueError(f"Invalid target length: {target_len}, accepts name only")
-        target = self.target[0]
-        if target not in self.conf:
+        if job_len := len(self.job) != 1:
+            raise ValueError(f"Invalid job length: {job_len}, accepts name only")
+        job = self.job[0]
+        if job not in self.conf:
             raise ValueError(
-                f"Invalid target: {target}, accepts one of {self.conf.target_names()}"
+                f"Invalid job: {job}, accepts one of {self.conf.job_names()}"
             )
-        script = self.conf.targets[target].script
+        script = self.conf.jobs[job].script
         envs = self.load_envs()
-        envs.update(self.conf.target_variables(target_name=target))
+        envs.update(self.conf.job_variables(job_name=job))
         subprocess.run(script, shell=True, env=envs)
 
 
@@ -84,10 +84,10 @@ def main() -> None:
 
     sub_parsers = parser.add_subparsers(required=True)
 
-    list_parser = sub_parsers.add_parser("list", help="list targets")
+    list_parser = sub_parsers.add_parser("list", help="list jobs")
     list_parser.set_defaults(func=cmd_list)
 
-    run_parser = sub_parsers.add_parser("run", help="run target")
+    run_parser = sub_parsers.add_parser("run", help="run job")
     run_parser.add_argument(
         "-d",
         "--dotenv",
@@ -99,7 +99,7 @@ def main() -> None:
     run_parser.add_argument(
         "-e",
         "--env",
-        dest="target_envs",
+        dest="job_envs",
         nargs="*",
         default=[],
         help="environment variables, formatted the same as dotenv contents",
@@ -112,7 +112,7 @@ def main() -> None:
         help="use os.environ variables if set to True",
     )
 
-    run_parser.add_argument("target", nargs=REMAINDER, help="target to run")
+    run_parser.add_argument("job", nargs=REMAINDER, help="job to run")
     run_parser.set_defaults(func=cmd_run)
     args = parser.parse_args()
     args.func(args)

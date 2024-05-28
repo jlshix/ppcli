@@ -5,12 +5,12 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 
-class Target(NamedTuple):
+class Job(NamedTuple):
     script: str
     variables: dict[str, str]
 
     @classmethod
-    def parse(cls, data: dict[str, str | dict[str, str]]) -> Target:
+    def parse(cls, data: dict[str, str | dict[str, str]]) -> Job:
         try:
             script = data["script"]
         except KeyError:
@@ -27,44 +27,44 @@ class Target(NamedTuple):
         return cls(script, variables)
 
 
-class Targets:
-    def __init__(self, targets: dict[str, Target]) -> None:
-        self.targets = targets
+class Jobs:
+    def __init__(self, jobs: dict[str, Job]) -> None:
+        self.jobs = jobs
 
     def __contains__(self, item: str) -> bool:
-        return item in self.targets
+        return item in self.jobs
 
-    def __getitem__(self, key: str) -> Target:
-        return self.targets[key]
+    def __getitem__(self, key: str) -> Job:
+        return self.jobs[key]
 
     def names(self) -> list[str]:
-        return sorted(self.targets.keys())
+        return sorted(self.jobs.keys())
 
     @classmethod
-    def parse(cls, data: dict[str, Any]) -> Targets:
+    def parse(cls, data: dict[str, Any]) -> Jobs:
         exceptions = []
-        targets = {}
+        jobs = {}
         for name, values in data.items():
             try:
-                targets[name] = Target.parse(values)
+                jobs[name] = Job.parse(values)
             except Exception as e:
                 exceptions.append(e)
         if exceptions:
             raise ExceptionGroup(
-                "parse ppcli targets failed",
+                "parse ppcli jobs failed",
                 exceptions,
             )
-        return cls(targets=targets)
+        return cls(jobs=jobs)
 
 
 class Conf:
     def __init__(self, data: dict[str, Any]) -> None:
-        raw_targets = {k: v for k, v in data.items() if not k.startswith("_")}
+        raw_jobs = {k: v for k, v in data.items() if not k.startswith("_")}
         self.variables: dict[str, str] = data.get("_variables", {})
-        self.targets = Targets.parse(raw_targets)
+        self.jobs = Jobs.parse(raw_jobs)
 
     def __contains__(self, key: str) -> bool:
-        return key in self.targets
+        return key in self.jobs
 
     @classmethod
     def from_path(cls, path: Path) -> "Conf":
@@ -83,15 +83,15 @@ class Conf:
             raise TypeError(f"tool.ppcli scope {scope} is not a dict")
         return cls(scope)
 
-    def target_names(self) -> list[str]:
-        return sorted(self.targets.names())
+    def job_names(self) -> list[str]:
+        return sorted(self.jobs.names())
 
-    def target_variables(self, target_name: str) -> dict[str, str]:
+    def job_variables(self, job_name: str) -> dict[str, str]:
         try:
-            target_variables = self.targets[target_name].variables
+            job_variables = self.jobs[job_name].variables
         except KeyError:
-            raise ValueError(f"Invalid target name {target_name}")
+            raise ValueError(f"Invalid job name {job_name}")
         return {
             **self.variables,
-            **target_variables,
+            **job_variables,
         }
