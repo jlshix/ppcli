@@ -9,6 +9,9 @@ class Job(NamedTuple):
     script: str
     variables: dict[str, str]
 
+    def __eq__(self, other: Job) -> bool:
+        return self.script == other.script and self.variables == other.variables
+
     @classmethod
     def parse(cls, data: dict[str, str | dict[str, str]]) -> Job:
         # TODO TypedDict data
@@ -39,6 +42,9 @@ class Jobs:
 
     def __getitem__(self, key: str) -> Job:
         return self.jobs[key]
+
+    def __eq__(self, other: Jobs) -> bool:
+        return self.jobs == other.jobs
 
     def names(self) -> list[str]:
         return sorted(self.jobs.keys())

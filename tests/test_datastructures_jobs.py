@@ -1,6 +1,6 @@
 import pytest
 
-from ppcli.datastructures import Job
+from ppcli.datastructures import Job, Jobs
 
 
 @pytest.mark.parametrize(
@@ -45,3 +45,49 @@ def test_job_parse_variables_type_error():
             "variables": ["name=world"],
         })
     assert exc.value.args[0] == "`variables` field should be a dict[str, str]"
+
+
+@pytest.mark.parametrize(
+    ("data", "jobs"),
+    [
+        (
+            {
+                "hello": {
+                    "script": "echo hello $name",
+                    "variables": {"name": "world"},
+                },
+                "build": {
+                    "script": "python3 -m build --wheel",
+                },
+            },
+            Jobs(jobs={
+                "hello": Job(
+                    script="echo hello $name",
+                    variables={"name": "world"}
+                ),
+                "build": Job(
+                    script="python3 -m build --wheel",
+                    variables={},
+                )
+            })
+        )
+    ]
+
+)
+def test_jos_parse_success(data, jobs):
+    parsed_jobs = jobs.parse(data)
+    assert parsed_jobs == jobs
+    assert jobs.names() == ["build", "hello"]
+    assert jobs["hello"].script == "echo hello $name"
+
+
+def test_jos_parse_failed():
+    with pytest.raises(ExceptionGroup) as exc:
+        Jobs.parse({
+            "build": {"script": ["python", "-m", "build"]},
+            "hello": {
+                "script": "echo hello $name",
+                "variables": ["name=world"],
+            },
+        })
+    assert str(exc.value) == 'parse ppcli jobs failed (2 sub-exceptions)'
