@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ppcli"
+dynamic = ["version"]
+description = "run script command defined in pyproject.toml"
+authors = [
+    { name = "jlshix", email = "jlshix@163.com" }
+]
+dependencies = [
+    "python-dotenv~=1.0.1",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.scripts]
+ppcli = "ppcli.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ppcli"]
+
+[tool.hatch.version]
+path = "src/ppcli/__init__.py"
+
+[tool.ppcli._variables]
+GLOBAL = "global"

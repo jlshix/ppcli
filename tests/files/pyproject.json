@@ -1,0 +1,9 @@
+{
+  "tools": {
+    "ppcli": {
+      "test": {
+        "script": "pytest --cov=src tests/"
+      }
+    }
+  }
+}

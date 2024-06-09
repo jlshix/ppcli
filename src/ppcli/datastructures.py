@@ -46,6 +46,9 @@ class Jobs:
     def __eq__(self, other: Jobs) -> bool:
         return self.jobs == other.jobs
 
+    def __bool__(self) -> bool:
+        return bool(self.jobs)
+
     def names(self) -> list[str]:
         return sorted(self.jobs.keys())
 
@@ -78,7 +81,7 @@ class Conf:
     @classmethod
     def from_path(cls, path: Path) -> "Conf":
         if not path.exists():
-            raise FileExistsError(f"{path} does not exist")
+            raise FileNotFoundError(f"{path} does not exist")
         with path.open() as f:
             try:
                 data = tomllib.loads(f.read())
@@ -89,7 +92,7 @@ class Conf:
         if scope is None:
             raise ValueError(f"No tool.ppcli scope defined in {path}")
         if not isinstance(scope, dict):
-            raise TypeError(f"tool.ppcli scope {scope} is not a dict")
+            raise TypeError(f"tool.ppcli scope is not a dict. got {type(scope)=}; {scope=}")
         return cls(scope)
 
     def job_names(self) -> list[str]:

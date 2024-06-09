@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ppcli"
+dynamic = ["version"]
+description = "run script command defined in pyproject.toml"
+authors = [
+    { name = "jlshix", email = "jlshix@163.com" }
+]
+dependencies = [
+    "python-dotenv~=1.0.1",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.scripts]
+ppcli = "ppcli.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ppcli"]
+
+[tool.hatch.version]
+path = "src/ppcli/__init__.py"
+
+[tool.ppcli._variables]
+GLOBAL = "global"
+
+[tool.ppcli.build]
+script = "python3 -m build --no-isolation --wheel"
+
+[tool.ppcli.install]
+script = "pip install --find-links=dist ppcli"
+
+[tool.ppcli.uninstall]
+script = "pip uninstall ppcli"
+
+[tool.ppcli.test]
+script = "pytest --cov=src tests/"
+
+[tool.ppcli.mypy]
+script = "mypy --strict src/"
+
+[tool.ppcli.check]
+script = "ruff check"
+
+[tool.ppcli.format]
+script = "ruff format"
+
+[tool.ppcli.show_env]
+variables = { GLOBAL = "GLB", LOCAL = "LOCAL" }
+script = "env | grep -i global"
